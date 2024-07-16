@@ -1,4 +1,5 @@
 import math
+import numpy as np
 
 def silu(x, get_derivative=False):
     """
@@ -23,14 +24,17 @@ def silu(x, get_derivative=False):
 
 
 def relu(x, get_derivative=False):
-    return x * (x > 0) if not get_derivative else 1.0 * (x >= 0)
+    if get_derivative:
+        return 1.0 * (x > 0)
+    return np.maximum(0, x)
+
  
 def tanh_act(x, get_derivative=False):
     if not get_derivative:
         return math.tanh(x)
     return 1 - math.tanh(x) ** 2
  
-def func_sigmoid(x, get_derivative=False):
+def sigmoid(x, get_derivative=False):
     if not get_derivative:
         return 1 / (1 + math.exp(-x))
-    return func_sigmoid(x) * (1 - func_sigmoid(x))
+    return sigmoid(x) * (1 - sigmoid(x))

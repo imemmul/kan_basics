@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.interpolate import BSpline
-from activations import silu
+# from act import silu
 
 
 def get_bsplines(x_bounds, n_basis, k=3, **kwargs):
@@ -18,7 +18,7 @@ def get_bsplines(x_bounds, n_basis, k=3, **kwargs):
     edge_fun[0] = lambda x: x / (1 + np.exp(-x))
     edge_fun_der[0] = lambda x: (1 + np.exp(-x) + x * np.exp(-x)) / np.power((1 + np.exp(-x)), 2)
     
-    t =  np.linspace(x_bounds[0 - k * step], x_bounds[1] + k * step, grid_len + 2 * k)
+    t = np.linspace(x_bounds[0] - k * step, x_bounds[1] + k * step, grid_len + 2 * k)
     t[k] , t[-k - 1] = x_bounds[0], x_bounds[1]
     
     for ind_spline in range(n_basis - 1):
