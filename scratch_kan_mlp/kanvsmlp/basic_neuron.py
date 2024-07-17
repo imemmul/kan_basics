@@ -33,6 +33,7 @@ class Neuron:
         self.compute_derivative_edge_wrt_weights()
         self.compute_derivative_edge_wrt_input()
         assert self.derivative_output_wrt_edge.shape == (self.num_inputs,)
+        # print(f"self.derivative_edge_wrt_input: {self.derivative_edge_wrt_input.shape}, self.num_inputs: {self.num_inputs}")
         assert self.derivative_edge_wrt_input.shape == (self.num_inputs,)
         assert self.derivative_edge_wrt_weights.shape == (self.num_inputs, self.num_weights_per_edge)
         

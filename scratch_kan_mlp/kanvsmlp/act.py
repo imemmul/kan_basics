@@ -22,6 +22,11 @@ def silu(x, get_derivative=False):
     
     return silu_value
 
+def softmax(logits):
+    # Subtract the max logit to avoid numerical instability
+    exp_logits = np.exp(logits - np.max(logits, axis=-1, keepdims=True))
+    return exp_logits / np.sum(exp_logits, axis=-1, keepdims=True)
+
 
 def relu(x, get_derivative=False):
     if get_derivative:

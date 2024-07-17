@@ -1,5 +1,5 @@
-from .basic_neuron import Neuron
-from .act import relu, silu, tanh_act, sigmoid
+from basic_neuron import Neuron
+from act import relu, silu, tanh_act, sigmoid
 import numpy as np
 
 class MLPNeuron(Neuron):
