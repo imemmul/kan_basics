@@ -1,8 +1,8 @@
-from kan import KANNeuron
-from mlp import MLPNeuron
+from .kan import KANNeuron
+from .mlp import MLPNeuron
 import numpy as np
 from tqdm import tqdm
-from loss import SquaredLoss, CrossEntropyLoss
+from .loss import SquaredLoss, CrossEntropyLoss
 
 class Layer:
     def __init__(self, n_inputs, n_outputs, neuron_class=KANNeuron, **kwargs):

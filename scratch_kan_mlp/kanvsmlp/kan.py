@@ -1,7 +1,7 @@
 import numpy as np
-from basic_neuron import Neuron
-from b_splines import get_bsplines
-from act import tanh_act, sigmoid, relu, silu
+from .basic_neuron import Neuron
+from .b_splines import get_bsplines
+from .act import tanh_act, sigmoid, relu, silu
 
 
 class KANNeuron(Neuron):

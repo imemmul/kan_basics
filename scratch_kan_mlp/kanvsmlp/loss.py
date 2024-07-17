@@ -1,5 +1,5 @@
 import numpy as np
-from act import softmax
+from .act import softmax
 
 class Loss:
     def __call__(self, y, y_train):
