@@ -1,0 +1,16 @@
+[2024-07-20 01:02:19,894][trainer][INFO] - Distributed environment: NO
+Num processes: 1
+Process index: 0
+Local process index: 0
+Device: mps
+
+Mixed precision type: no
+
+[2024-07-20 01:02:19,908][trainer][INFO] - ***** Running training *****
+[2024-07-20 01:02:19,908][trainer][INFO] -   Num examples = 60000
+[2024-07-20 01:02:19,908][trainer][INFO] -   Num batches each epoch = 1875
+[2024-07-20 01:02:19,908][trainer][INFO] -   Num Epochs = 250
+[2024-07-20 01:02:19,908][trainer][INFO] -   Instantaneous batch size per device = 32
+[2024-07-20 01:02:19,908][trainer][INFO] -   Total train batch size (w. parallel, distributed & accumulation) = 32
+[2024-07-20 01:02:19,908][trainer][INFO] -   Gradient Accumulation steps = 1
+[2024-07-20 01:02:19,908][trainer][INFO] -   Total optimization steps = 468750
