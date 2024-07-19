@@ -4,9 +4,6 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
 sys.path.append(parent_dir)
 from kanvsmlp import KANNetwork, KANNeuron, CrossEntropyLoss, get_bsplines
-import torch.nn as nn
-import torch.nn.functional as F
-import torch
 import numpy as np
 
 class KANClassification:
