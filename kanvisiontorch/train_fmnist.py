@@ -5,17 +5,16 @@ from torchvision import transforms
 import torch
 from torchvision.datasets import FashionMNIST
 from torch.utils.data import DataLoader
-# from trainer import train_model
 from tqdm import tqdm
 import time
+import os
 
-def train_model_basic(model, train_loader, val_loader, optimizer, loss_func, cfg):
+def train_model_basic(model, train_loader, val_loader, optimizer, loss_func, cfg, epoch):
     model.train()
     running_loss = 0.0
     pbar = tqdm(train_loader, desc="Training")
     for images, labels in pbar:
         start = time.time()
-        # print(f"Images: {images.shape}, Labels: {labels.shape}")
         images, labels = images.to(cfg.device), labels.to(cfg.device)
     
         optimizer.zero_grad()
@@ -29,8 +28,11 @@ def train_model_basic(model, train_loader, val_loader, optimizer, loss_func, cfg
         print(f"Time taken: {end - start:.2f}s")
 
     epoch_loss = running_loss / len(train_loader.dataset)
-    # print(f"Training Loss: {epoch_loss:.4f}")
+    print(f"Epoch {epoch+1} Training Loss: {epoch_loss:.4f}")
 
+    # Save the model at specified intervals
+    if (epoch + 1) % cfg.save_interval == 0 or (epoch + 1) == cfg.epochs:
+        save_model(model, cfg, epoch)
 
 def evaluate_basic(model, test_loader, criterion, device):
     model.eval()
@@ -53,17 +55,18 @@ def evaluate_basic(model, test_loader, criterion, device):
     accuracy = 100 * correct / total
     print(f"Test Loss: {epoch_loss:.4f}, Accuracy: {accuracy:.2f}%")
 
+def save_model(model, cfg, epoch):
+    os.makedirs(cfg.save_dir, exist_ok=True)
+    save_path = os.path.join(cfg.save_dir, f"model_epoch_{epoch+1}.pt")
+    torch.save(model.state_dict(), save_path)
+    print(f"Model saved to {save_path}")
+
 def load_dataset(dataset_path, batch_size):
-    """
-    loads fmnmist dataset
-    
-    """
     transform = transforms.Compose([
-    transforms.ToTensor(),  # Convert the images to PyTorch tensors
-    transforms.Normalize((0.5,), (0.5,))  # Normalize the images to [-1, 1] range
+        transforms.ToTensor(),
+        transforms.Normalize((0.5,), (0.5,))
     ])
 
-    # Load the FashionMNIST dataset
     train_dataset = FashionMNIST(root=dataset_path, train=True, download=True, transform=transform)
     test_dataset = FashionMNIST(root=dataset_path, train=False, download=True, transform=transform)
 
@@ -72,10 +75,10 @@ def load_dataset(dataset_path, batch_size):
     
     return train_dataloader, test_dataloader
 
-
 @hydra.main(config_path='./configs', config_name='fmnist.yaml')
 def main(cfg):
     model = KANClassification(input_channel=1, n_classes=10, height=28, width=28, device=cfg.device)
+    model.to(cfg.device)
     train_loader, test_loader = load_dataset(cfg.dataset_path, cfg.train_batch_size)
     loss = nn.CrossEntropyLoss(label_smoothing=cfg.loss.label_smoothing)
     optimizer_class = torch.optim.AdamW
@@ -87,14 +90,12 @@ def main(cfg):
         weight_decay=cfg.optim.adam_weight_decay,
         eps=cfg.optim.adam_epsilon,
     )
+
     for epoch in range(cfg.epochs):
         print(f"Epoch {epoch+1}/{cfg.epochs}")
-        train_model_basic(model=model, train_loader=train_loader, val_loader=test_loader, optimizer=optimizer, loss_func=loss, cfg=cfg)
+        train_model_basic(model=model, train_loader=train_loader, val_loader=test_loader, optimizer=optimizer, loss_func=loss, cfg=cfg, epoch=epoch)
         if epoch % 50 == 0:
             evaluate_basic(model=model, test_loader=test_loader, criterion=loss, device=cfg.device)
-    # print(model)
-    # train_model(model=model, dataset_train=train_loader, dataset_val=test_loader, dataset_test=None, loss_func=loss, cfg=cfg)
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
