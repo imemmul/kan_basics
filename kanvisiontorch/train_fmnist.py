@@ -5,14 +5,17 @@ from torchvision import transforms
 import torch
 from torchvision.datasets import FashionMNIST
 from torch.utils.data import DataLoader
-from trainer import train_model
+# from trainer import train_model
 from tqdm import tqdm
+import time
 
 def train_model_basic(model, train_loader, val_loader, optimizer, loss_func, cfg):
     model.train()
     running_loss = 0.0
-    for images, labels in tqdm(train_loader, desc="Training"):
-        print(f"Images: {images.shape}, Labels: {labels.shape}")
+    pbar = tqdm(train_loader, desc="Training")
+    for images, labels in pbar:
+        start = time.time()
+        # print(f"Images: {images.shape}, Labels: {labels.shape}")
         images, labels = images.to(cfg.device), labels.to(cfg.device)
     
         optimizer.zero_grad()
@@ -20,11 +23,13 @@ def train_model_basic(model, train_loader, val_loader, optimizer, loss_func, cfg
         loss = loss_func(outputs, labels)
         loss.backward()
         optimizer.step()
-        print(f"Loss: {loss.item()}")
+        pbar.set_postfix_str(f"Loss: {loss.item():.4f}")
         running_loss += loss.item() * images.size(0)
+        end = time.time()
+        print(f"Time taken: {end - start:.2f}s")
 
     epoch_loss = running_loss / len(train_loader.dataset)
-    print(f"Training Loss: {epoch_loss:.4f}")
+    # print(f"Training Loss: {epoch_loss:.4f}")
 
 
 def evaluate_basic(model, test_loader, criterion, device):
