@@ -1,16 +1,18 @@
 # @package _global_
-output_dir: "/home/emir-machine/dev/runs/fmnist_kan_convs/"
-dataset_path: "/home/emir-machine/dev/datasets/fmnist"
-logging_dir: "/home/emir-machine/dev/runs/fmnist_kan_convs/logs/"
+# output_dir: "/home/emir-machine/dev/runs/fmnist_kan_convs/"
+dataset_path: "/Users/emirulurak/Desktop/dev/myresearchs/kan/priv__/datasets/"
+# logging_dir: "/home/emir-machine/dev/runs/fmnist_kan_convs/logs/"
+save_dir: "./weights/"
 model_name: "fmnist_kan_convs"
 gradient_accumulation_steps: 1
 mixed_precision: 'no'
-epochs: 250
+epochs: 5
+save_interval: 
 train_batch_size: 32
 val_batch_size: 32
 dataloader_num_workers: 1
 seed: 472
-device: 'cuda'
+device: 'cpu'
 max_train_steps: none
 max_grad_norm: 2.
 

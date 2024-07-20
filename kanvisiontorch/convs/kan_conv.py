@@ -8,9 +8,9 @@ class KANClassification(nn.Module):
         super(KANClassification, self).__init__()
         self.device = device
         self.conv_layers = nn.ModuleList([
-            ConvKANLayer(input_channel, 4, 3, device=self.device),
+            ConvKANLayer(input_channel, 2, 3, device=self.device),
             nn.MaxPool2d(3),
-            ConvKANLayer(4, 2, 3, device=self.device),
+            ConvKANLayer(2, 2, 3, device=self.device),
         ]).to(self.device)
 
         self.kan_network = KAN([72, 36, n_classes], device=self.device)

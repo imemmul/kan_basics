@@ -25,7 +25,7 @@ def train_model_basic(model, train_loader, val_loader, optimizer, loss_func, cfg
         pbar.set_postfix_str(f"Loss: {loss.item():.4f}")
         running_loss += loss.item() * images.size(0)
         end = time.time()
-        print(f"Time taken: {end - start:.2f}s")
+        # print(f"Time taken: {end - start:.2f}s")
 
     epoch_loss = running_loss / len(train_loader.dataset)
     print(f"Epoch {epoch+1} Training Loss: {epoch_loss:.4f}")
@@ -68,10 +68,15 @@ def load_dataset(dataset_path, batch_size):
     ])
 
     train_dataset = FashionMNIST(root=dataset_path, train=True, download=True, transform=transform)
+    train_dataset_subset = torch.utils.data.Subset(train_dataset, range(0, 10000))
+    
     test_dataset = FashionMNIST(root=dataset_path, train=False, download=True, transform=transform)
+    test_dataset_subset = torch.utils.data.Subset(test_dataset, range(0, 1000))
 
-    train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
-    test_dataloader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
+    # train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, pin_memory=True)
+    # test_dataloader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, pin_memory=True)
+    train_dataloader = DataLoader(train_dataset_subset, batch_size=batch_size, shuffle=True, pin_memory=True)
+    test_dataloader = DataLoader(test_dataset_subset, batch_size=batch_size, shuffle=False, pin_memory=True)
     
     return train_dataloader, test_dataloader
 
