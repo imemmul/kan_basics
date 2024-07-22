@@ -10,4 +10,4 @@ This repository is dedicated to learning the basics of Kolmogorov-Arnold network
 
 - [x] Implement basic Kolmogorov-Arnold network from scratch
 - [x] Apply the network to basic image classification tasks
-- [] Optimize for CUDA (at least try whats the deal with it)
+- [ ] Optimize for CUDA (at least try whats the deal with it)
