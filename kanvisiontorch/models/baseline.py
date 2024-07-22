@@ -8,12 +8,13 @@ class KANBaseline(nn.Module):
         super(KANBaseline, self).__init__()
         self.device = device
         self.conv_layers = nn.ModuleList([
-            Conv2DKAN(input_channel, 2, 3, device=self.device),
+            Conv2DKAN(input_channel, 4, 3, device=self.device),
+            Conv2DKAN(4, 4, 3, device=self.device),
             nn.AvgPool2d(3),
-            Conv2DKAN(2, 2, 3, device=self.device),
+            Conv2DKAN(4, 2, 3, device=self.device),
         ]).to(self.device)
         self.kan_network = KAN([72, 36, n_classes], device=self.device, base_activation=nn.Tanh)
-        # self.kan_network = KAN([128, 64, n_classes], device=self.device, base_activation=nn.Tanh)
+        # self.kan_network = KAN([32, 16, n_classes], device=self.device, base_activation=nn.Tanh)
     def forward(self, x):
         for i, layer in enumerate(self.conv_layers):
             x = layer(x)

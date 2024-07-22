@@ -40,13 +40,16 @@ def save_model(model, cfg, epoch):
 
 def load_dataset(dataset_path, batch_size):
     transform = transforms.Compose([
+        # transforms.RandomHorizontalFlip(),
+        # transforms.RandomCrop(32, padding=4),
+        # transforms.ToTensor(),
         transforms.ToTensor(),
+        transforms.Normalize((0.5,), (0.5,))
     ])
-
     train_dataset = FashionMNIST(root=dataset_path, train=True, download=True, transform=transform)
     test_dataset = FashionMNIST(root=dataset_path, train=False, download=True, transform=transform)
     # train_dataset = CIFAR10(root=dataset_path, train=True, download=True, transform=transform)
-    # test_dataset = CIFAR10(root=dataset_path, train=False, download=True, transform=transform)
+    # test_dataset = CIFAR10(root=dataset_path, train=False, download=True, transform=transforms.ToTensor())
 
     train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, pin_memory=True)
     test_dataloader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, pin_memory=True)
@@ -98,7 +101,7 @@ def main(cfg):
         print(f"Epoch {epoch+1} Training Loss: {epoch_loss:.4f}")
         if (epoch + 1) % cfg.save_interval == 0 or (epoch + 1) == cfg.epochs:
             save_model(model, cfg, epoch)
-            if epoch % 1 == 0:
+            if epoch % 5 == 0:
                 evaluate_basic(model=model, test_loader=test_loader, criterion=loss_func, device=cfg.device)
 
 if __name__ == "__main__":
