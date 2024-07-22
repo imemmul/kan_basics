@@ -6,25 +6,17 @@ save_dir: "./weights/"
 model_name: "fmnist_kan_convs"
 gradient_accumulation_steps: 1
 mixed_precision: 'no'
-epochs: 5
+epochs: 3
 save_interval: 1
 train_batch_size: 32
 val_batch_size: 32
-dataloader_num_workers: 1
+dataloader_num_workers: -1
 seed: 472
 device: 'cpu'
 max_train_steps: none
-max_grad_norm: 2.
 
 use_torch_compile: false
 unpack_data: true
-
-checkpointing_steps: 5000
-checkpoints_total_limit: 1000
-find_unused_parameters: false
-
-metrics:
-  report_type: 'classification'
 
 model:
   groups: 1
@@ -32,10 +24,6 @@ model:
   width_scale: 1
   num_classes: 10
   is_moe: false
-
-wandb:
-  entity: 'None'
-  project_name: 'cifar100-tune_eight'
 
 optim:
   type: 'adamW'

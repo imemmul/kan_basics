@@ -1,1 +1,1 @@
-from .kan_conv import ConvKANLayer, KANClassification
+from .kan_conv import Conv2DKAN
