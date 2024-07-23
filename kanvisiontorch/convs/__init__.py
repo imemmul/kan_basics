@@ -1,1 +1,1 @@
-from .kan_conv import Conv2DKAN
+from .kan_conv import Conv2DKAN, Conv2DFastKAN
