@@ -1,27 +1,27 @@
 # @package _global_
-# output_dir: "/home/emir-machine/dev/runs/fmnist_kan_convs/"
-# output_dir: "/Users/emirulurak/Desktop/dev/myresearchs/kan/priv__/datasets/"
-# dataset_path: "/home/emir-machine/dev/datasets/FashionMNIST/"
-dataset_path: "/Users/emirulurak/Desktop/dev/myresearchs/kan/priv__/datasets/"
-logging_dir: "/home/emir-machine/dev/runs/fmnist_kan_convs/logs/"
+output_dir: "/home/emir-machine/dev/runs/fmnist_kan_convs/"
+dataset_path: "/home/emir-machine/dev/datasets/FashionMNIST/"
 save_dir: "./weights/"
-model_name: "fmnist_kan_convs"
+dataset_name: "fmnist"
+model_name: "kanbaseline"
 gradient_accumulation_steps: 1
 mixed_precision: 'no'
-epochs: 10
-save_interval: 1
+epochs: 5
+save_interval: 5
 train_batch_size: 32
 val_batch_size: 32
 dataloader_num_workers: -1
 seed: 472
-device: 'cpu'
+device: 'cuda'
+inference: false
+model_path: none
 max_train_steps: none
 
 use_torch_compile: false
 unpack_data: true
 
 optim:
-  type: 'adamW'
+  type: 'AdamW'
   learning_rate: 1e-3
   adam_beta1: 0.9
   adam_beta2: 0.999
@@ -31,6 +31,7 @@ optim:
   lr_power: 0.2
   lr_end: 1e-7
   set_grads_to_none: false
+  momentum: 0.9
 
 loss:
   label_smoothing: 0.05

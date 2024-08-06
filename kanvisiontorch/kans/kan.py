@@ -3,6 +3,7 @@ from torch import nn
 import torch.nn.functional as F
 from typing import *
 from .utils import L1
+from torch.profiler import profile, record_function
 
 
 # NOTE nn.GELU fixed to conv 0 gradient problem
@@ -17,9 +18,7 @@ class KAN(nn.Module):
         self.layers = nn.ModuleList()
         self.n_layers = len(layers_shape[:-1])
         for i in range(self.n_layers):
-            # self.layers.append(KANLayer(n_in=layers_shape[i], n_out=layers_shape[i+1],
-            #                             base_activation=base_activation, x_bounds=x_bounds, k=k, device=device, **kwargs))
-            self.layers.append(KANLayer(n_in=layers_shape[i], n_out=layers_shape[i+1],
+            self.layers.append(BSplineLayer(n_in=layers_shape[i], n_out=layers_shape[i+1],
                                         base_activation=base_activation, x_bounds=x_bounds, k=k, **kwargs))
     
     def forward(self, x):
@@ -28,9 +27,57 @@ class KAN(nn.Module):
             x = layer(x)
         return x
 
-class KANLayer(nn.Module):
+# TODO implement piecewise below doesn't work well
+class PieceWiseLinearIntLayer(nn.Module):
+    def __init__(self, n_in, n_out, base_activation=nn.GELU, device='cuda', **kwargs):
+        super(PieceWiseLinearIntLayer, self).__init__()
+        self.n_in = n_in
+        self.n_out = n_out
+        self.device = device
+        self.base_activation = base_activation()
+        self.weights = nn.Parameter(torch.randn(n_out, n_in, device=self.device))
+        self.biases = nn.Parameter(torch.randn(n_out, device=self.device))
+        
+        self.grid_points = nn.Parameter(torch.linspace(-1, 1, 10, device=self.device), requires_grad=False)
+        self.slopes = nn.Parameter(torch.randn(n_out, n_in, len(self.grid_points) - 1, device=self.device))
+        self.intercepts = nn.Parameter(torch.randn(n_out, n_in, len(self.grid_points) - 1, device=self.device))
+        
+        self.layer_norm = nn.LayerNorm(n_out, elementwise_affine=False).to(self.device)
+        self.prelu = nn.PReLU().to(self.device)
+        nn.init.kaiming_uniform_(self.weights, nonlinearity='linear')
+        nn.init.kaiming_uniform_(self.slopes, nonlinearity='linear')
+        nn.init.kaiming_uniform_(self.intercepts, nonlinearity='linear')
+    
+    def forward(self, x):
+        x = x.to(self.device)
+        b_out = F.linear(self.base_activation(x), self.weights, self.biases)
+        
+        num_samples = x.size(0)
+        x_expanded = x.unsqueeze(-1)
+        diff = x_expanded - self.grid_points
+        pos = (diff >= 0).float()
+
+        segment_index = pos.sum(dim=-1).long() - 1
+        segment_index = torch.clamp(segment_index, 0, len(self.grid_points) - 2)
+        
+        # getting the slopes and intercepts for each segment
+        segment_index_expanded = segment_index.unsqueeze(-1).unsqueeze(-1).expand(num_samples, self.n_in, 1, self.n_out)
+        slopes = torch.gather(self.slopes.permute(2, 1, 0).unsqueeze(0).expand(num_samples, -1, -1, -1), 1, segment_index_expanded).squeeze(2).permute(0, 2, 1)
+        intercepts = torch.gather(self.intercepts.permute(2, 1, 0).unsqueeze(0).expand(num_samples, -1, -1, -1), 1, segment_index_expanded).squeeze(2).permute(0, 2, 1)
+        
+        # Apply the piecewise linear transformation
+        x_expanded = x.unsqueeze(1).expand(num_samples, self.n_out, self.n_in)
+        linear_output = slopes * x_expanded + intercepts
+        
+        # Sum over the segments
+        linear_output = linear_output.sum(dim=-1)
+        
+        x = self.prelu(self.layer_norm(b_out + linear_output))
+        return x
+    
+class BSplineLayer(nn.Module):
     def __init__(self, n_in, n_out, base_activation=nn.GELU, x_bounds=[-1, 1], k=3, device='cpu', **kwargs):
-        super(KANLayer, self).__init__()
+        super(BSplineLayer, self).__init__()
         self.n_in = n_in
         self.n_out = n_out
         self.device = device
@@ -79,4 +126,3 @@ if __name__ == "__main__":
     x = torch.rand((2, 3))
     y = kan_layer(x)
     print(y.shape)
-    
